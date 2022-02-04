@@ -24,7 +24,7 @@
 #define BLUE_LED    GPIO_NUM_2
 #define BUTTON      GPIO_NUM_15
 
-//uint8_t state = 0;  // 0 Led Desligado // 1 Led Ligado // 2 Led Piscando
+
 
 void Pin_As_Output(uint8_t pinNum){
    gpio_set_direction(pinNum, GPIO_MODE_OUTPUT);
