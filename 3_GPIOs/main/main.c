@@ -24,20 +24,44 @@
 #define BLUE_LED    GPIO_NUM_2
 #define BUTTON      GPIO_NUM_15
 
-
-
+/**
+ * @brief  Configura o pino como saida
+ * @note   Pode controlar o nivel logico do pino
+ * @param  pinNum: Numeracao do pino a ser configurado
+ * @retval None
+ */
 void Pin_As_Output(uint8_t pinNum){
    gpio_set_direction(pinNum, GPIO_MODE_OUTPUT);
 }
 
+/**
+ * @brief  Configura o nivel logico do pino de saida
+ * @note   Pode configurar como nivel alto ou baixo
+ * @param  pinNum: Numero do pino a ser configurado
+ * @param  level: Boleano true = alto, false = baixo
+ * @retval None
+ */
 void Set_Pin_Level(uint8_t pinNum, bool level){
     gpio_set_level(pinNum, level);
 }
 
+/**
+ * @brief  Interrupcao que é acionada no instante em que o evento acontece
+ * @note   Nao sobrecarregar esta função, termine-a o mais rapido possivel
+ * @param  *interrupt_flag: O endereço da variavel que vai avisar que a interrupcao foi acionada
+ * @retval 
+ */
 void IRAM_ATTR Pin_ISR_Handler(void* *interrupt_flag){
     *interrupt_flag = *interrupt_flag + 1;
 }
 
+/**
+ * @brief  Configura um pino para acionar uma interrupcao
+ * @note   Definir o numero do pino, o tipo de interrupcao, o modo do botao
+ * @param  pinNum: Numero do pino a ser configurado
+ * @param  *interrupt_flag: Endereco da variavel a ser passada para a interrupcao interagir
+ * @retval None
+ */
 void Pin_As_IRAM_Input(uint8_t pinNum, uint8_t *interrupt_flag){
     gpio_config_t io_config = {
         .mode = GPIO_MODE_INPUT,
@@ -52,6 +76,13 @@ void Pin_As_IRAM_Input(uint8_t pinNum, uint8_t *interrupt_flag){
     gpio_isr_handler_add(pinNum, Pin_ISR_Handler, (void*) interrupt_flag);
 }
 
+/**
+ * @brief  
+ * @note   
+ * @param  start: 
+ * @param  time_us: 
+ * @retval 
+ */
 bool Timeout_Expired(uint64_t start, uint64_t time_us){
     uint64_t time_now = esp_timer_get_time() - start;
     if(time_now >= time_us){
@@ -62,6 +93,12 @@ bool Timeout_Expired(uint64_t start, uint64_t time_us){
     }
 }
 
+/**
+ * @brief  
+ * @note   
+ * @param  *interrupt_flag: 
+ * @retval None
+ */
 void Run_States(uint8_t *interrupt_flag){
     #define MAX_STATE   3
     #define DELAY_US    500000
