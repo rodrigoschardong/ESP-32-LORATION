@@ -1,10 +1,5 @@
-/* Hello World Example
-
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
+/* 
+* Rodrigo Schardong
 */
 #include <stdio.h>
 //#include <stdlib.h>
@@ -43,6 +38,15 @@ void Pin_As_Output(uint8_t pinNum){
  */
 void Set_Pin_Level(uint8_t pinNum, bool level){
     gpio_set_level(pinNum, level);
+}
+/**
+ * @brief  Le o nivel logico no pino de entrada
+ * @note   Pode ler se o nivel esta alto ou baixo
+ * @param  pinNum: Numero do pino a ser lido
+ * @retval Boleano se o nivel esta alto ou baixo
+ */
+bool Get_Pin_Level(uint8_t pinNum){
+    return gpio_get_level(pinNum);
 }
 
 /**
