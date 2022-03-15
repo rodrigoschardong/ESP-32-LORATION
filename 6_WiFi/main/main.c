@@ -14,37 +14,28 @@
 #include "esp_err.h"
 #include "driver/gpio.h"
 
+#include "nvs_flash.h"
+#include "esp_log.h"
 
-esp_err_t Funcao_Demonstracao(bool *status_pin){
-    #define GPIO_PIN GPIO_NUM_2
-    esp_err_t error = gpio_set_level(GPIO_PIN, *status_pin);
-    *status_pin = !(*status_pin);
-    return error;
+#include "AccessPoint.h"
+
+#define TAG "Main"
+void NVS(void){
+    //NVS é a sigla para armazenamento de armazenamento não volátil.
+  ESP_LOGI(TAG, "Init NVS");
+  esp_err_t ret = nvs_flash_init();
+  if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+    ESP_ERROR_CHECK(nvs_flash_erase());
+    ret = nvs_flash_init();
+  }
+  ESP_ERROR_CHECK(ret);
+  ESP_LOGI(TAG, "NVS done\n");
 }
 
 void app_main(void)
 {
-    printf("Hello world!\n");
-
-    /* Print chip information */
-    esp_chip_info_t chip_info;
-    esp_chip_info(&chip_info);
-    printf("This is ESP32 chip with %d CPU cores, WiFi%s%s, ",
-            chip_info.cores,
-            (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",
-            (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
-
-    printf("silicon revision %d, ", chip_info.revision);
-
-    printf("%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
-            (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
-
-    for (int i = 10; i >= 0; i--) {
-        printf("Restarting in %d seconds...\n", i);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-    printf("Restarting now.\n");
-    fflush(stdout);
-    esp_restart();
+    NVS();
+    //Start AP
+    wifi_ap_init();
 }
 
