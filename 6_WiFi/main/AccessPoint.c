@@ -24,17 +24,17 @@
 
 void wifi_ap_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data) {
     if(event_id == WIFI_EVENT_AP_START){
-        ESP_LOGI(TAG, "PONTO DE ACESSO INICIADO.");
+        ESP_LOGI(TAG, "Access Point Started");
     } else if(event_id == WIFI_EVENT_AP_STACONNECTED){
         wifi_event_ap_staconnected_t* event = (wifi_event_ap_staconnected_t*) event_data;
-        ESP_LOGI(TAG, "ESTAÇÃO "MACSTR" ID DE ACESSO %d, SE CONECTOU.", MAC2STR(event->mac), event->aid);
+        ESP_LOGI(TAG, "Station "MACSTR" join, AID = %d, connected.", MAC2STR(event->mac), event->aid);
     } else if (event_id == WIFI_EVENT_AP_STADISCONNECTED){
         wifi_event_ap_stadisconnected_t* event = (wifi_event_ap_stadisconnected_t*) event_data;
-        ESP_LOGI(TAG, "ESTAÇÃO "MACSTR" ID DE ACESSO %d DESCONECTOU.", MAC2STR(event->mac), event->aid);
+        ESP_LOGI(TAG, "Station "MACSTR" join, AID = %d, disconnected.", MAC2STR(event->mac), event->aid);
     } else if( event_id == WIFI_EVENT_AP_STOP){
-        ESP_LOGI(TAG, "PONTO DE ACESSO DESLIGADO.");
+        ESP_LOGI(TAG, "Access Point Stop");
     } else {
-        ESP_LOGI(TAG, "Evento de WIFI desconhecido");
+        ESP_LOGI(TAG, "Unknow Event");
     }
 }
 
@@ -49,7 +49,7 @@ void wifi_ap_init(void) {
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-    
+
     ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT,
                                                         ESP_EVENT_ANY_ID,
                                                         &wifi_ap_event_handler,

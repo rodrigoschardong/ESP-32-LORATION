@@ -18,8 +18,11 @@
 #include "esp_log.h"
 
 #include "AccessPoint.h"
+#include "Server.h"
 
 #define TAG "Main"
+
+#define WEB_MOUNT_POINT "www"
 void NVS(void){
     //NVS é a sigla para armazenamento de armazenamento não volátil.
   ESP_LOGI(TAG, "Init NVS");
@@ -37,5 +40,6 @@ void app_main(void)
     NVS();
     //Start AP
     wifi_ap_init();
+    ESP_ERROR_CHECK(start_rest_server(WEB_MOUNT_POINT));
 }
 
