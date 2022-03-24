@@ -4,6 +4,7 @@
   "files.associations": {
     "*.inc": "c",
     "esp_log.h": "c",
-    "err.h": "c"
+    "err.h": "c",
+    "esp_system.h": "c"
   }
 }

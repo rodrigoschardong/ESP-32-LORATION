@@ -8,6 +8,8 @@
 //#include "../../src/config.h"
 //#include "routes.h"
 
+#include "html.h"
+
 #define TAG "Server:"
 
 #define REST_CHECK(a, str, goto_tag, ...)                                              \
@@ -30,6 +32,7 @@ typedef struct rest_server_context {
 /* Simple handler for getting system handler */
 static esp_err_t system_info_get_handler(httpd_req_t *req)
 {
+    ESP_LOGI(TAG, "Showing system info");
     httpd_resp_set_type(req, "application/json");
     cJSON *root = cJSON_CreateObject();
     esp_chip_info_t chip_info;
@@ -69,12 +72,12 @@ esp_err_t start_rest_server(const char *base_path)
     /* URI handler for getting web server files */
     //UNUSED
     httpd_uri_t common_get_uri = {
-        .uri = "/*",
+        .uri = "/init",
         .method = HTTP_GET,
-        //.handler = rest_common_get_handler,
+        .handler = html_root_get_handler,
         .user_ctx = rest_context
     };
-    //httpd_register_uri_handler(server, &common_get_uri);
+    httpd_register_uri_handler(server, &common_get_uri);
     
     return ESP_OK;
 err_start:
