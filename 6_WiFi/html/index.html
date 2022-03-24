@@ -1,13 +1,169 @@
 <!DOCTYPE html><html>
     <head>
-
+        <title>
+            Led Control
+        </title>
     </head>
+    <style>
+        html {
+            display: inline-block;
+            margin: 0px auto;
+            text-align: center;
+        }
+
+        body {
+            background-color: rgb(129, 194, 231);
+        }
+        h1 {
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        }
+
+        .title {
+            display: block;
+            background-color: rgb(76, 148, 230);
+            border-radius: 20px;
+            border-top-left-radius: 100px;
+            border-top-right-radius: 100px;
+            border-style: hidden;
+            line-height: 120px;
+            margin-top: 25px;
+            margin-bottom: 25px;
+
+            max-width: 78%;
+            margin-left: 11%;
+            margin-right: 11%;
+        }
+
+        .status {
+            background-color: rgb(123, 169, 221);
+            max-width: 80%;
+            min-width: 70%;
+            margin-left: 10%;
+            margin-right: 10%;
+
+            height: 400px;
+
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border-style: hidden;
+            border-radius: 10px;
+        }
+        .data_space{
+            display: block;
+            height: 5px;
+            margin-bottom: 10px;
+        }
+        .data {
+            display: block;
+            font-size: larger;
+            text-align: center;
+
+            background-color: rgb(115, 170, 220);
+            
+            max-width: 90%;
+            margin-left: 5%;
+            margin-right: 5%;
+            margin-top: 20px;
+            margin-bottom: 50px;
+
+            border-style: none;
+            border-radius: 90px;
+
+            line-height: 250px;
+        }
+
+        .button {
+            background-color: rgb(110, 130, 224);
+            display: block;
+            
+            width:20%;
+            height: 0px;
+
+            margin-left: 40%;
+            margin-right: 40%;
+            margin-top: 5%;
+            margin-bottom: 5%;
+
+            border-radius: 10px;
+            border-style: outset;
+            block-size: auto;
+        }
+    </style>
     <body>
-        <h1>
-            Hello World!
-        </h1>
-        <h2>
-            It works!
-        </h2>
+        <div class = "title">
+            <h1> Led Control </h1>
+        </div>
+        <div class = "status">
+            <div class="data_space">
+
+            </div>
+            <div class = "data">
+                <p id="led_status">{{led_status}}</p>
+            </div>
+            <a class="button" action = "/intro">
+                <p id = "led_status_neg">{{led_status_neg}} </p>
+            </a>
+        </div>
+        <div class="control">
+        
+        </div>
+
+        <div class = bottom>
+            <p> Rodrigo Schardong <br> Eng de Comp - Uergs</p>
+        </div>
+        </body>
+        <!--
+        <script>
+            document.addEventListener("DOMContentLoaded", function(event) {
+                window.setInterval(function() {
+                    loadDistance(); loadDistanceBase(); loadOnOff();
+                }, 500)
+                
+            });
+        
+            function loadDistance() {
+                var ajax = new XMLHttpRequest();
+                ajax.open("GET", "http://192.168.4.2:8090/distance", true);
+                ajax.send();
+                ajax.onreadystatechange = function () {
+                    if (ajax.readyState == 4 && ajax.status == 200) {
+                        var data = ajax.responseText;
+                        document.getElementById("distance").innerHTML = data;
+                        console.log(data);
+                    } else {
+                        console.log("Deu algum erro");
+                    }
+                }
+            }
+            function loadDistanceBase() {
+                var ajax = new XMLHttpRequest();
+                ajax.open("GET", "http://192.168.4.2:8090/distanceBase", true);
+                ajax.send();
+                ajax.onreadystatechange = function () {
+                    if (ajax.readyState == 4 && ajax.status == 200) {
+                        var data = ajax.responseText;
+                        document.getElementById("distanceBase").innerHTML = data;
+                        console.log(data);
+                    } else {
+                        console.log("Deu algum erro");
+                    }
+                }
+            }
+            function loadOnOff() {
+                var ajax = new XMLHttpRequest();
+                ajax.open("GET", "http://192.168.4.2:8090/onoff", true);
+                ajax.send();
+                ajax.onreadystatechange = function () {
+                    if (ajax.readyState == 4 && ajax.status == 200) {
+                        var data = ajax.responseText;
+                        document.getElementById("onoff").innerHTML = data;
+                        console.log(data);
+                    } else {
+                        console.log("Deu algum erro");
+                    }
+                }
+            }
+        </script>
+        -->
     </body>
 </html>
