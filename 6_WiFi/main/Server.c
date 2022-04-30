@@ -46,6 +46,15 @@ static esp_err_t system_info_get_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
+esp_err_t Button_Switch(httpd_req_t *req){
+    //Switch Led
+
+    //Send Html
+    html_root_get_handler(NULL);
+
+    return ESP_OK;
+}
+
 esp_err_t start_rest_server(const char *base_path)
 {
     REST_CHECK(base_path, "wrong base path", err);
@@ -70,7 +79,6 @@ esp_err_t start_rest_server(const char *base_path)
     httpd_register_uri_handler(server, &system_info_get_uri);
 
     /* URI handler for getting web server files */
-    //UNUSED
     httpd_uri_t common_get_uri = {
         .uri = "/init",
         .method = HTTP_GET,
@@ -79,6 +87,14 @@ esp_err_t start_rest_server(const char *base_path)
     };
     httpd_register_uri_handler(server, &common_get_uri);
     
+    httpd_uri_t common_get_uri_b = {
+        .uri = "/button",
+        .method = HTTP_GET,
+        .handler = Button_Switch,
+        .user_ctx = rest_context
+    };
+    httpd_register_uri_handler(server, &common_get_uri_b);
+
     return ESP_OK;
 err_start:
     free(rest_context);
