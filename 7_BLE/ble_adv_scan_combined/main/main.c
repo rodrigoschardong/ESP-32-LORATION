@@ -15,5 +15,5 @@ void app_main(void)
     ble_main();
     //gpio_main();
     //xTaskCreate(gpio_main, "gpio_main", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
-    xTaskCreate(gpio_main, "gpio_main_thread", configMINIMAL_STACK_SIZE *  29, NULL, 5, NULL);
+    xTaskCreate(gpio_main, "gpio_main_thread", configMINIMAL_STACK_SIZE *  3, NULL, 5, NULL);
 }
