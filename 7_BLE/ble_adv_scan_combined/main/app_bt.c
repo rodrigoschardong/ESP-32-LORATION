@@ -135,6 +135,8 @@ static void hci_cmd_send_ble_adv_start(void)
     ESP_LOGI(TAG, "BLE Advertising started..");
 }
 
+
+
 static void hci_cmd_send_ble_set_adv_param(void)
 {
     /* Minimum and maximum Advertising interval are set in terms of slots. Each slot is of 625 microseconds. */
@@ -169,11 +171,48 @@ static void hci_cmd_send_ble_set_adv_param(void)
     esp_vhci_host_send_packet(hci_cmd_buf, sz);
 }
 
-static void hci_cmd_send_ble_set_adv_data(void) // Set Packet
+//init
+void ble_adv_set_data(uint8_t *payload, uint8_t payload_len )// Set Packet
 {
     //MAC: EC:94:CB:6F:5B:8A
-    //char *adv_name = "ESP-BLE-1";
-    char *adv_name = "RODRIGO";
+    char *adv_name = "ESP-BLE-1";
+    //char *adv_name = "RODRIGO";
+    uint8_t name_len = (uint8_t)strlen(adv_name);
+    uint8_t adv_data[31] = {0x02, 0x01, 0x06, 0x0, 0x09};
+    uint8_t adv_data_len = 5;
+
+    adv_data[3] = name_len + 1;
+    for (int i = 0; i < name_len; i++) {
+        adv_data[adv_data_len + i] = (uint8_t)adv_name[i];
+    }
+    adv_data_len = adv_data_len + name_len;
+
+    adv_data[adv_data_len ] = payload_len + 3;
+    adv_data_len++;
+    adv_data[adv_data_len ] = 0xff;
+    adv_data_len++;
+    adv_data[adv_data_len ] = 0x59;
+    adv_data_len++;
+    adv_data[adv_data_len ] = 0x00;
+    adv_data_len++;
+    for(int i = 0; i < payload_len ; i++)
+        adv_data[adv_data_len + i] = payload[i];
+    adv_data_len = adv_data_len + payload_len ;
+
+    //My test end
+
+    uint16_t sz = make_cmd_ble_set_adv_data(hci_cmd_buf, adv_data_len, (uint8_t *)adv_data);
+    esp_vhci_host_send_packet(hci_cmd_buf, sz);
+    ESP_LOGI(TAG, "Starting BLE advertising with name \"%s\"", adv_name);
+    ESP_LOGI(TAG, "Starting BLE advertising with data \"%s\"", adv_data);
+}
+///end
+
+void hci_cmd_send_ble_set_adv_data() // Set Packet
+{
+    //MAC: EC:94:CB:6F:5B:8A
+    char *adv_name = "ESP-BLE-1";
+    //char *adv_name = "RODRIGO";
     uint8_t name_len = (uint8_t)strlen(adv_name);
     uint8_t adv_data[31] = {0x02, 0x01, 0x06, 0x0, 0x09};
     uint8_t adv_data_len = 5;
@@ -185,7 +224,8 @@ static void hci_cmd_send_ble_set_adv_data(void) // Set Packet
     adv_data_len = adv_data_len + name_len;
 
     //My test start
-    char *payload = "PAYLOAD";
+    char *payload = "AAA";
+    //uint8_t *payload =  led_status;
     uint8_t payload_len = (uint8_t)strlen(payload);
 
     adv_data[adv_data_len ] = payload_len + 3;
@@ -395,7 +435,7 @@ reset:
     }
 }
 
-void app_main(void)
+void ble_main()
 {
     bool continue_commands = 1;
     int cmd_cnt = 0;
