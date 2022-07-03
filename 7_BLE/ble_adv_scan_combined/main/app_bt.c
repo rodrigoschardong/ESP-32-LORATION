@@ -117,6 +117,8 @@ static void hci_cmd_send_ble_scan_params(void)
     uint8_t filter_policy = 0x00; /* Accept all packets excpet directed advertising packets (default). */
     uint16_t sz = make_cmd_ble_set_scan_params(hci_cmd_buf, scan_type, scan_interval, scan_window, own_addr_type, filter_policy);
     esp_vhci_host_send_packet(hci_cmd_buf, sz);
+
+    ESP_LOGI(TAG, "Ble new packed %s", (char*)&hci_cmd_buf);
 }
 
 static void hci_cmd_send_ble_scan_start(void)
@@ -392,6 +394,7 @@ void hci_evt_process(void *pvParameters)
 
                         /* Print the data if adv report has a valid name. */
                         if (ret == ESP_OK) {
+                            //MAC ADDRESS
                             printf("******** Response %d/%d ********\n", i + 1, num_responses);
                             printf("Event type: %02x\nAddress type: %02x\nAddress: ", event_type[i], addr_type[i]);
                             for (int j = 5; j >= 0; j -= 1) {
@@ -400,9 +403,17 @@ void hci_evt_process(void *pvParameters)
                                     printf(":");
                                 }
                             }
-
+                            //DATA 
                             printf("\nData length: %d", data_len[i]);
                             data_msg_ptr += data_len[i];
+
+                            printf("\nData: ");
+                            for (int l = 0; l < data_len[i]; l++)
+                            {
+                                printf("%d", data_msg[l]);
+                            }
+                            
+
                             printf("\nAdvertisement Name: ");
                             for (int k = 0; k < scanned_name->name_len; k += 1 ) {
                                 printf("%c", scanned_name->scan_local_name[k]);
