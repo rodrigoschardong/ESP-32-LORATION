@@ -176,19 +176,20 @@ static void hci_cmd_send_ble_set_adv_param(void)
 //init
 void ble_adv_set_data(uint8_t *payload, uint8_t payload_len )// Set Packet
 {
-    //MAC: EC:94:CB:6F:5B:8A
     char *adv_name = "ESP-BLE-1";
-    //char *adv_name = "RODRIGO";
     uint8_t name_len = (uint8_t)strlen(adv_name);
-    uint8_t adv_data[31] = {0x02, 0x01, 0x06, 0x0, 0x09};
+    uint8_t adv_data[31] = {0x02, 0x01, 0x06}; //Device Data
     uint8_t adv_data_len = 5;
 
+    //Device Name
     adv_data[3] = name_len + 1;
+    adv_data[4] = 0x09;
     for (int i = 0; i < name_len; i++) {
         adv_data[adv_data_len + i] = (uint8_t)adv_name[i];
     }
     adv_data_len = adv_data_len + name_len;
 
+    //Company ID
     adv_data[adv_data_len ] = payload_len + 3;
     adv_data_len++;
     adv_data[adv_data_len ] = 0xff;
@@ -197,16 +198,13 @@ void ble_adv_set_data(uint8_t *payload, uint8_t payload_len )// Set Packet
     adv_data_len++;
     adv_data[adv_data_len ] = 0x00;
     adv_data_len++;
+    //Payload
     for(int i = 0; i < payload_len ; i++)
         adv_data[adv_data_len + i] = payload[i];
     adv_data_len = adv_data_len + payload_len ;
 
-    //My test end
-
     uint16_t sz = make_cmd_ble_set_adv_data(hci_cmd_buf, adv_data_len, (uint8_t *)adv_data);
     esp_vhci_host_send_packet(hci_cmd_buf, sz);
-    ESP_LOGI(TAG, "Starting BLE advertising with name \"%s\"", adv_name);
-    ESP_LOGI(TAG, "Starting BLE advertising with data \"%s\"", adv_data);
 }
 ///end
 
@@ -410,10 +408,10 @@ void hci_evt_process(void *pvParameters)
                             printf("\nData: ");
                             for (int l = 0; l < data_len[i]; l++)
                             {
-                                printf("%d", data_msg[l]);
+                                printf("%d ", data_msg[l]);
                             }
                             
-
+                            //Nome do Pacote
                             printf("\nAdvertisement Name: ");
                             for (int k = 0; k < scanned_name->name_len; k += 1 ) {
                                 printf("%c", scanned_name->scan_local_name[k]);
