@@ -1,0 +1,7 @@
+{
+  "C_Cpp.intelliSenseEngine": "Tag Parser",
+  "files.associations": {
+    "gpio.h": "c"
+  },
+  "idf.portWin": "COM7"
+}
