@@ -17,6 +17,9 @@
 #include "esp_attr.h"
 #include "esp_log.h"
 
+#include "adc.h"
+#include "pwm.h"
+
 static const char *TAG = "example";
 
 /**
@@ -41,9 +44,9 @@ static const char *TAG = "example";
  *   - reaches 'l_lim' value or 'h_lim' value,
  *   - will be reset to zero.
  */
-#define PCNT_H_LIM_VAL      10
-#define PCNT_L_LIM_VAL     -10
-#define PCNT_THRESH1_VAL    5
+#define PCNT_H_LIM_VAL      100
+#define PCNT_L_LIM_VAL     -100
+#define PCNT_THRESH1_VAL    10
 #define PCNT_THRESH0_VAL   -5
 #define PCNT_INPUT_SIG_IO   4  // Pulse Input GPIO
 #define PCNT_INPUT_CTRL_IO  5  // Control GPIO HIGH=count up, LOW=count down
@@ -77,6 +80,8 @@ static void IRAM_ATTR pcnt_example_intr_handler(void *arg)
 /* Configure LED PWM Controller
  * to output sample pulses at 1 Hz with duty of about 10%
  */
+
+
 static void ledc_init(void)
 {
     // Prepare and then apply the LEDC PWM timer configuration
@@ -84,7 +89,7 @@ static void ledc_init(void)
     ledc_timer.speed_mode       = LEDC_LOW_SPEED_MODE;
     ledc_timer.timer_num        = LEDC_TIMER_1;
     ledc_timer.duty_resolution  = LEDC_TIMER_10_BIT;
-    ledc_timer.freq_hz          = 10;  // set output frequency at 10 Hz
+    ledc_timer.freq_hz          = 1;  // set output frequency at 10 Hz
     ledc_timer.clk_cfg = LEDC_AUTO_CLK;
     ledc_timer_config(&ledc_timer);
 
@@ -100,11 +105,13 @@ static void ledc_init(void)
     ledc_channel_config(&ledc_channel);
 }
 
+
 /* Initialize PCNT functions:
  *  - configure and initialize PCNT
  *  - set up the input filter
  *  - set up the counter events to watch
  */
+
 static void pcnt_example_init(int unit)
 {
     /* Prepare configuration for the PCNT unit */
@@ -153,15 +160,55 @@ static void pcnt_example_init(int unit)
     pcnt_counter_resume(unit);
 }
 
+void PulseGeneratorHandle(){
+    //ADC
+    #define ADC_WIDTH       ADC_WIDTH_BIT_11
+    #define ADC_CHANNEL     ADC_CHANNEL_6       //gpio 34
+    #define ADC_NUM_SAMPLES 10
+    uint16_t pot_value;
+
+    //PWM
+    #define MotorDelayTimer 250
+    uint16_t maxDuty;
+    uint16_t minDuty;
+    bool motorStatus = false;
+
+    esp_err_t err;
+    //ADC Setup
+
+    err = ADC_Setup(ADC_WIDTH, ADC_CHANNEL);
+
+    PWMConfig();
+
+    uint16_t lastPotValue = 0;
+    while(1){
+        err = ADC_Read(&pot_value, ADC_CHANNEL, ADC_NUM_SAMPLES);
+        if(pot_value != lastPotValue){
+            //PWMSetDutyWithFade(pot_value, MotorDelayTimer);
+            ESP_LOGI(TAG, "Current pot value :%d", pot_value);
+            PWMReConfig(pot_value);
+            lastPotValue = pot_value;
+        }
+        vTaskDelay(pdMS_TO_TICKS(1500));
+    }
+
+}
+
 void app_main(void)
 {
+    ESP_LOGI(TAG,"Starting");
     int pcnt_unit = PCNT_UNIT_0;
+    ESP_LOGI(TAG,"PC Unit: %d", pcnt_unit);
+    
     /* Initialize LEDC to generate sample pulse signal */
-    ledc_init();
+    //ledc_init();
+    //ESP_LOGI(TAG,"Ledc Inited");
+    xTaskCreate(PulseGeneratorHandle, "PulseGeneratorHandle", configMINIMAL_STACK_SIZE * 3, NULL, 5, NULL);
 
     /* Initialize PCNT event queue and PCNT functions */
     pcnt_evt_queue = xQueueCreate(10, sizeof(pcnt_evt_t));
     pcnt_example_init(pcnt_unit);
+    ESP_LOGI(TAG,"PCNT Inited");
 
     int16_t count = 0;
     pcnt_evt_t evt;
