@@ -44,13 +44,14 @@ static const char *TAG = "example";
  *   - reaches 'l_lim' value or 'h_lim' value,
  *   - will be reset to zero.
  */
-#define PCNT_H_LIM_VAL      100
-#define PCNT_L_LIM_VAL     -100
-#define PCNT_THRESH1_VAL    10
-#define PCNT_THRESH0_VAL   -5
-#define PCNT_INPUT_SIG_IO   4  // Pulse Input GPIO
-#define PCNT_INPUT_CTRL_IO  5  // Control GPIO HIGH=count up, LOW=count down
-#define LEDC_OUTPUT_IO      18 // Output GPIO of a sample 1 Hz pulse generator
+#define PCNT_H_LIM_VAL              100
+#define PCNT_L_LIM_VAL             -100
+#define PCNT_THRESH1_VAL             10
+#define PCNT_THRESH0_VAL             -5
+#define PCNT_INPUT_SIG_IO_LEFT       22  // Pulse Input GPIO
+#define PCNT_INPUT_SIG_IO_RIGHT      23  // Pulse Input GPIO
+#define PCNT_INPUT_CTRL_IO            5  // Control GPIO HIGH=count up, LOW=count down
+#define LEDC_OUTPUT_IO               18  // Output GPIO of a sample 1 Hz pulse generator
 
 xQueueHandle pcnt_evt_queue;   // A queue to handle pulse counter events
 
@@ -112,12 +113,12 @@ static void ledc_init(void)
  *  - set up the counter events to watch
  */
 
-static void pcnt_example_init(int unit)
+static void pcnt_example_init(int unit, uint8_t pin_num)
 {
     /* Prepare configuration for the PCNT unit */
     pcnt_config_t pcnt_config = {
         // Set PCNT input signal and control GPIOs
-        .pulse_gpio_num = PCNT_INPUT_SIG_IO,
+        .pulse_gpio_num = pin_num,
         .ctrl_gpio_num = PCNT_INPUT_CTRL_IO,
         .channel = PCNT_CHANNEL_0,
         .unit = unit,
@@ -197,8 +198,9 @@ void PulseGeneratorHandle(){
 void app_main(void)
 {
     ESP_LOGI(TAG,"Starting");
-    int pcnt_unit = PCNT_UNIT_0;
-    ESP_LOGI(TAG,"PC Unit: %d", pcnt_unit);
+    int pcnt_unit0 = PCNT_UNIT_0;
+    uint8_t pcnt_unit1 = PCNT_UNIT_1;
+    ESP_LOGI(TAG,"PC Unit: %d", pcnt_unit0);
     
     /* Initialize LEDC to generate sample pulse signal */
     //ledc_init();
@@ -207,7 +209,8 @@ void app_main(void)
 
     /* Initialize PCNT event queue and PCNT functions */
     pcnt_evt_queue = xQueueCreate(10, sizeof(pcnt_evt_t));
-    pcnt_example_init(pcnt_unit);
+    pcnt_example_init(pcnt_unit0, PCNT_INPUT_SIG_IO_LEFT);
+    pcnt_example_init(pcnt_unit1, PCNT_INPUT_SIG_IO_RIGHT);
     ESP_LOGI(TAG,"PCNT Inited");
 
     int16_t count = 0;
@@ -219,7 +222,7 @@ void app_main(void)
          */
         res = xQueueReceive(pcnt_evt_queue, &evt, 1000 / portTICK_PERIOD_MS);
         if (res == pdTRUE) {
-            pcnt_get_counter_value(pcnt_unit, &count);
+            pcnt_get_counter_value(evt.unit, &count);
             ESP_LOGI(TAG, "Event PCNT unit[%d]; cnt: %d", evt.unit, count);
             if (evt.status & PCNT_EVT_THRES_1) {
                 ESP_LOGI(TAG, "THRES1 EVT");
@@ -237,7 +240,7 @@ void app_main(void)
                 ESP_LOGI(TAG, "ZERO EVT");
             }
         } else {
-            pcnt_get_counter_value(pcnt_unit, &count);
+            pcnt_get_counter_value(evt.unit, &count);
             ESP_LOGI(TAG, "Current counter value :%d", count);
         }
     }
