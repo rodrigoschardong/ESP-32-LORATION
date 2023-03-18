@@ -14,6 +14,12 @@
 
 static const char *TAG = "example";
 
+typedef struct{
+    char ssid[SSID_MAX_LEN];
+    char pass[SSID_MAX_LEN];
+
+} wifi_settings_t;
+
 void clean_string(char *str) {
     char *cleaned = malloc(strlen(str) + 1); // allocate a buffer to hold the cleaned string
     if (!cleaned) {
@@ -35,24 +41,19 @@ void clean_string(char *str) {
 }
 
 
-esp_err_t Write_String_Data(char* data, char* label){
+esp_err_t Write_Data_Flash(wifi_settings_t data, char* label){
     const esp_partition_t *partition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_ANY, label);
     assert(partition != NULL);
-    size_t data_len = strlen(data);
-    
-    if (data_len >= SSID_MAX_LEN) {
-        ESP_LOGE(TAG, "Data is larger than the buffer size.");
-        return ESP_FAIL;
-    }
+    size_t data_len = sizeof(wifi_settings_t);
+
     // Prepare data to be read later using the mapped address
     ESP_ERROR_CHECK(esp_partition_erase_range(partition, 0, partition->size));
-    ESP_ERROR_CHECK(esp_partition_write(partition, 0, data, data_len));
-    ESP_LOGI(TAG, "Written sample data to partition: %s", data);
+    ESP_ERROR_CHECK(esp_partition_write(partition, 0, &data, data_len));
     
     return ESP_OK;
 }
 
-esp_err_t Read_String_Data(char* data, char* label){
+esp_err_t Read_Data_Flash(wifi_settings_t* data, char* label){
     const esp_partition_t *partition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_ANY, label);
     assert(partition != NULL);
     const void *map_ptr;
@@ -63,12 +64,9 @@ esp_err_t Read_String_Data(char* data, char* label){
     ESP_LOGI(TAG, "Mapped partition to data memory address %p", map_ptr);
 
     // Read back the written verification data using the mapped memory pointer
-    char read_data[SSID_MAX_LEN];
-    memcpy(read_data, map_ptr, sizeof(read_data));
-    clean_string(read_data);
-    ESP_LOGI(TAG, "Read sample data from partition using mapped memory: %s", (char*) read_data);
-    
-    strcpy(data, read_data);
+    memcpy(data, map_ptr, sizeof(wifi_settings_t));
+    clean_string(data->ssid);
+    clean_string(data->pass);
     
     spi_flash_munmap(map_handle);
     ESP_LOGI(TAG, "Unmapped partition from data memory");
@@ -91,14 +89,29 @@ void app_main(void)
     // Find the partition map in the partition table
     
     char label[] = "storage";
-    static const char SSID[SSID_MAX_LEN] = "MY_SSID_EXAMPLE";
 
-    ESP_ERROR_CHECK(Write_String_Data(SSID, label));
+    //static const char SSID[SSID_MAX_LEN] = "MY_SSID_EXAMPLE";
 
-    char memSSID[SSID_MAX_LEN];
-    Read_String_Data(memSSID, label);
+    const wifi_settings_t wifi_settings = {
+        .ssid = "MY_SSID_EXAMPLE",
+        .pass = "MY_PASS_EXAMPLE"
+    };
+    wifi_settings_t mem_wifi_settings = {
+        .ssid = "",
+        .pass = ""
+    };
     
-    if(strcmp(SSID, memSSID) == 0)
+    //ESP_ERROR_CHECK(Write_Data_Flash(wifi_settings, label));
+    //ESP_LOGI(TAG, "Written sample data to partition: %s", wifi_settings.ssid);
+    //ESP_LOGI(TAG, "Written sample data to partition: %s", wifi_settings.pass);
+
+    //char memSSID[SSID_MAX_LEN];
+    
+    Read_Data_Flash(&mem_wifi_settings, label);
+    ESP_LOGI(TAG, "Read sample data from partition using mapped memory: %s", (char*) mem_wifi_settings.ssid);
+    ESP_LOGI(TAG, "Read sample data from partition using mapped memory: %s", (char*) mem_wifi_settings.pass);
+    
+    if(strcmp(wifi_settings.ssid, mem_wifi_settings.ssid) == 0)
         ESP_LOGI(TAG, "Data matches");
     else
         ESP_LOGI(TAG, "Data dont't matches");
