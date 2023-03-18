@@ -88,7 +88,7 @@ void app_main(void)
 
     // Find the partition map in the partition table
     
-    char label[] = "storage";
+    char label[] = "wifi_settings";
 
     //static const char SSID[SSID_MAX_LEN] = "MY_SSID_EXAMPLE";
 
@@ -101,9 +101,9 @@ void app_main(void)
         .pass = ""
     };
     
-    //ESP_ERROR_CHECK(Write_Data_Flash(wifi_settings, label));
-    //ESP_LOGI(TAG, "Written sample data to partition: %s", wifi_settings.ssid);
-    //ESP_LOGI(TAG, "Written sample data to partition: %s", wifi_settings.pass);
+    ESP_ERROR_CHECK(Write_Data_Flash(wifi_settings, label));
+    ESP_LOGI(TAG, "Written sample data to partition: %s", wifi_settings.ssid);
+    ESP_LOGI(TAG, "Written sample data to partition: %s", wifi_settings.pass);
 
     //char memSSID[SSID_MAX_LEN];
     
