@@ -5,6 +5,10 @@
     "*.inc": "c",
     "esp_log.h": "c",
     "err.h": "c",
-    "esp_system.h": "c"
-  }
+    "esp_system.h": "c",
+    "chrono": "c",
+    "event_groups.h": "c"
+  },
+  "idf.portWin": "COM5",
+  "idf.flashType": "UART"
 }
