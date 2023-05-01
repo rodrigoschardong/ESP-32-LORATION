@@ -21,7 +21,7 @@
 
 void NVS(void);
 static void SPIFFS_Directory(char * path);
-esp_err_t SPIFFS_Mount(char * path, char * label, int max_files)
+esp_err_t SPIFFS_Mount(char * path, char * label, int max_files);
 
 void app_main(void)
 {
