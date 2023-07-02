@@ -9,6 +9,7 @@
 #include "esp_partition.h"
 #include "esp_log.h"
 #include "esp_err.h"
+#include "cJSON.h"
 
 #define SSID_MAX_LEN 32
 
