@@ -212,7 +212,7 @@ esp_err_t SPIFFS_Mount(char * path, char * label, int max_files) {
 	esp_err_t ret = esp_vfs_spiffs_register(&conf);
 
 	if (ret != ESP_OK) {
-		if (ret ==ESP_FAIL) {
+		if (ret == ESP_FAIL) {
 			ESP_LOGE(TAG, "Failed to mount or format filesystem");
 		} else if (ret== ESP_ERR_NOT_FOUND) {
 			ESP_LOGE(TAG, "Failed to find SPIFFS partition");
